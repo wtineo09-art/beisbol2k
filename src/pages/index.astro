@@ -1,0 +1,179 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LatinoLeaderboard from '../components/LatinoLeaderboard.astro';
+import PlayerOfTheWeek from '../components/PlayerOfTheWeek.astro';
+import AdsenseUnit from '../components/AdsenseUnit.astro';
+
+import { wpquery } from '../lib/wp.js';
+
+let posts = [];
+let error = null;
+
+try {
+  const data = await wpquery({
+    query: `
+      query GetRecentPosts {
+        posts(first: 8) {
+          nodes {
+            title
+            slug
+            excerpt
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+            categories {
+              nodes {
+                name
+              }
+            }
+          }
+        }
+      }
+    `
+  });
+  posts = data?.posts?.nodes || [];
+} catch (e) {
+  error = e.message;
+  console.error("No se pudo conectar a la API GraphQL de Béisbol2K:", e);
+}
+
+// Separamos el post principal de los secundarios
+const featuredPost = posts.length > 0 ? posts[0] : null;
+const secondaryPosts = posts.length > 1 ? posts.slice(1) : [];
+
+// Helper para extraer la imagen destacada (GraphQL)
+function getFeaturedImage(post) {
+  return post?.featuredImage?.node?.sourceUrl || 'https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop';
+}
+
+// Helper para extraer la categoría (GraphQL)
+function getCategory(post) {
+  const cats = post?.categories?.nodes;
+  return cats && cats.length > 0 ? cats[0].name : 'MLB';
+}
+---
+
+<Layout title="Béisbol2K | Las Mejores Noticias de la MLB">
+	
+	<!-- ESPACIO VIP PARA ADSENSE SUPERIOR -->
+	<AdsenseUnit format="auto" />
+
+	<div class="max-w-7xl mx-auto px-4 py-8">
+		
+		{error && (
+			<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-8" role="alert">
+				<p class="font-bold">Error de Conexión</p>
+				<p>{error}. Por favor, verifica que la API REST esté habilitada en beisbol2k.com.</p>
+			</div>
+		)}
+
+		{!error && posts.length === 0 && (
+			<div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-8" role="alert">
+				<p class="font-bold">Sin Noticias</p>
+				<p>Aún no hay publicaciones en la web.</p>
+			</div>
+		)}
+
+		{/* BLOQUE PRINCIPAL (PORTADA TIPO PERIÓDICO) */}
+		{featuredPost && (
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+				
+				{/* Post Destacado Gran Impacto (Ocupa 2 de 3 columnas) */}
+				<div class="lg:col-span-2 relative group overflow-hidden bg-white shadow-xl">
+					<div class="relative w-full h-[400px] md:h-[500px]">
+						<img 
+							src={getFeaturedImage(featuredPost)} 
+							alt={featuredPost.title.rendered} 
+							class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+						/>
+						<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+						
+						<div class="absolute bottom-0 left-0 p-8 w-full">
+							<span class="bg-red-600 text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-3 inline-block">
+								{getCategory(featuredPost)}
+							</span>
+							<h1 class="text-3xl md:text-5xl font-extrabold text-white uppercase leading-tight mb-4" set:html={featuredPost.title}></h1>
+							<div class="text-gray-200 text-base md:text-lg mb-4 line-clamp-2" set:html={featuredPost.excerpt}></div>
+							<a href={`/${featuredPost.slug}`} class="border-2 border-white text-white px-6 py-2 uppercase font-bold text-sm hover:bg-white hover:text-black transition-colors inline-block">LEER NOTICIA EXTRA INNING</a>
+						</div>
+					</div>
+				</div>
+
+				{/* Columna Derecha de la Portada (Top 3 secundarios) */}
+				<div class="flex flex-col gap-6">
+					{secondaryPosts.slice(0, 3).map((post) => (
+						<article class="bg-white shadow-md flex h-[150px] overflow-hidden group">
+							<div class="w-1/3 h-full overflow-hidden relative">
+								<img 
+									src={getFeaturedImage(post)} 
+									alt="Thumb" 
+									class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+								/>
+							</div>
+							<div class="w-2/3 p-4 flex flex-col justify-center">
+								<span class="text-red-600 font-bold text-[0.65rem] uppercase tracking-widest mb-1">{getCategory(post)}</span>
+								<h2 class="text-lg font-bold uppercase leading-tight group-hover:text-blue-900 transition-colors line-clamp-3">
+									<a href={`/${post.slug}`} set:html={post.title}></a>
+								</h2>
+							</div>
+						</article>
+					))}
+				</div>
+
+			</div>
+		)}
+
+		<!-- ESPACIO VIP PARA ADSENSE MEDIO -->
+		<AdsenseUnit layoutKey="-gw-3+c-2z" format="fluid" />
+
+		<!-- COMPONENTE JUGADOR DE LA SEMANA -->
+		<PlayerOfTheWeek />
+
+		{/* BLOQUE SECUNDARIO CON SIDEBAR */}
+		<div class="flex flex-col lg:flex-row gap-8">
+			
+			<!-- Sección Noticias Restantes (70%) -->
+			<div class="w-full lg:w-[70%]">
+				<h2 class="text-3xl font-extrabold font-oswald border-b-4 border-red-600 pb-2 mb-8 uppercase text-blue-900 inline-block tracking-tight">Últimas Noticias</h2>
+				
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+					{secondaryPosts.slice(3).map((post) => (
+						<article class="bg-white shadow-lg flex flex-col group border-t-2 border-red-600/20">
+							<div class="relative h-48 overflow-hidden">
+								<img 
+									src={getFeaturedImage(post)} 
+									alt="Thumb Grid" 
+									class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+								/>
+								<span class="absolute top-0 right-0 bg-blue-900 text-white px-2 py-1 text-[10px] font-bold uppercase m-3 tracking-widest">
+									{getCategory(post)}
+								</span>
+							</div>
+							<div class="p-6 flex-grow flex flex-col text-center">
+								<h3 class="text-xl font-bold uppercase leading-tight mb-3 line-clamp-2 hover:text-red-600 transition-colors font-oswald tracking-wide">
+									<a href={`/${post.slug}`} set:html={post.title}></a>
+								</h3>
+								<div class="text-gray-600 text-sm line-clamp-3 mb-4 mx-auto font-open leading-relaxed" set:html={post.excerpt}></div>
+								<div class="mt-auto">
+									<span class="text-xs text-gray-400 font-bold uppercase tracking-widest px-4 border-t border-gray-100 pt-3 block mt-2">Seguir Leyendo &rarr;</span>
+								</div>
+							</div>
+						</article>
+					))}
+				</div>
+			</div>
+
+			<!-- Sidebar Derecha (30%) -->
+			<aside class="w-full lg:w-[30%]">
+				<div class="sticky top-6 flex flex-col gap-8">
+					<!-- Integración Élite Latina con AdSense Intercalado -->
+					<LatinoLeaderboard />
+				</div>
+			</aside>
+
+		</div>
+
+	</div>
+</Layout>

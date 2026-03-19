@@ -1,0 +1,230 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AdsenseUnit from '../components/AdsenseUnit.astro';
+import { wpquery } from '../lib/wp.js';
+
+export async function getStaticPaths() {
+  try {
+    const response = await wpquery({
+      query: `
+        query GetAllSlugsAndCategories {
+          posts(first: 50) {
+            nodes {
+              slug
+              title
+              content
+              date
+              featuredImage {
+                node {
+                  sourceUrl
+                }
+              }
+              categories {
+                nodes {
+                  name
+                }
+              }
+            }
+          }
+          categories(first: 50) {
+            nodes {
+              slug
+              name
+              posts(first: 12) {
+                nodes {
+                  title
+                  slug
+                  excerpt
+                  featuredImage {
+                    node {
+                      sourceUrl
+                    }
+                  }
+                  categories {
+                    nodes {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `
+    });
+    
+    const posts = response?.posts?.nodes || [];
+    const categories = response?.categories?.nodes || [];
+    
+    const recentPosts = posts.slice(0, 5);
+    
+    const postPaths = posts.map((post) => ({
+      params: { slug: post.slug },
+      props: { type: 'post', data: post, recentPosts },
+    }));
+
+    const categoryPaths = categories.map((category) => ({
+      params: { slug: category.slug },
+      props: { type: 'category', data: category, recentPosts },
+    }));
+
+    // Evitar colisiones: Si un post y una categoría tienen el mismo slug, post gana.
+    const uniqueSlugs = new Set();
+    const finalPaths = [];
+    
+    for (const path of [...postPaths, ...categoryPaths]) {
+      if (!uniqueSlugs.has(path.params.slug)) {
+        uniqueSlugs.add(path.params.slug);
+        finalPaths.push(path);
+      }
+    }
+
+    return finalPaths;
+  } catch (error) {
+    console.error("❌ [Astro Dev] CRÍTICO:", error.message);
+    return [];
+  }
+}
+
+const { type, data, recentPosts } = Astro.props;
+const post = type === 'post' ? data : null;
+const category = type === 'category' ? data : null;
+
+// Helpers
+function getFeaturedImage(p) {
+  return p?.featuredImage?.node?.sourceUrl || 'https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop';
+}
+function getCategoryName(p) {
+  const cats = p?.categories?.nodes;
+  return cats && cats.length > 0 ? cats[0].name : 'MLB';
+}
+
+const pageTitle = type === 'post' ? `${post.title} | Béisbol2K` : type === 'category' ? `Noticias de ${category.name} | Béisbol2K` : "Error 404 - Béisbol2K";
+---
+
+<Layout title={pageTitle}>
+
+	<div class="max-w-7xl mx-auto px-4 py-8">
+        {!data ? (
+            <div class="text-center py-20 bg-white shadow-md p-10 border-t-4 border-red-600">
+                <h1 class="text-4xl font-oswald text-red-600 mb-4 uppercase font-bold tracking-tight">Error de Recepción</h1>
+                <p class="text-gray-600 text-lg">No se pudo cargar el contenido debido a bloqueos de red local. En Vercel funcionará perfectamente.</p>
+                <a href="/" class="text-white bg-blue-900 px-6 py-3 font-bold uppercase mt-6 inline-block hover:bg-red-600 transition hover:shadow-lg">Volver a la Portada</a>
+            </div>
+        ) : type === 'post' ? (
+            <div class="flex flex-col lg:flex-row gap-10">
+                
+                <!-- COLUMNA PRINCIPAL DEL ARTÍCULO (70%) -->
+                <article class="w-full lg:w-[70%] bg-white p-6 md:p-10 shadow-lg border-t-4 border-red-600">
+                    
+                    <span class="bg-red-600 text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-4 inline-block">
+                        {getCategoryName(post)}
+                    </span>
+                    
+                    <h1 class="text-4xl md:text-5xl font-extrabold uppercase leading-tight mb-6 font-oswald text-gray-900 tracking-tighter" set:html={post.title}></h1>
+                    
+                    <div class="flex items-center text-sm text-gray-500 font-bold uppercase mb-8 pb-4 border-b border-gray-200 tracking-wide font-oswald">
+                        <span>Por Equipo Béisbol2K</span>
+                        <span class="mx-3 text-gray-300">|</span>
+                        <span>{new Date(post.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                    
+                    <div class="w-full h-[300px] md:h-[500px] mb-8 overflow-hidden rounded-sm relative group">
+                        <img src={getFeaturedImage(post)} alt="Imagen Noticia" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                    </div>
+
+                    <!-- ESPACIO ADSENSE - IN-ARTICLE TOP -->
+                    <AdsenseUnit layoutKey="-gw-3+c-2z" format="fluid" />
+                    
+                    <!-- CONTENIDO WYSIWYG IMPORTADO DE WP -->
+                    <div class="prose prose-lg max-w-none text-gray-700 font-open leading-relaxed
+                        prose-a:text-blue-700 prose-a:font-bold prose-a:no-underline hover:prose-a:underline hover:prose-a:text-red-600
+                        prose-img:rounded-sm prose-img:shadow-md
+                        prose-headings:font-oswald prose-headings:uppercase prose-headings:font-extrabold prose-headings:text-gray-900
+                        prose-p:mb-6" 
+                        set:html={post.content}>
+                    </div>
+                    
+                    <!-- ESPACIO ADSENSE - IN-ARTICLE BOTTOM -->
+                    <AdsenseUnit format="auto" />
+
+                    <div class="border-t border-gray-200 mt-8 pt-8 flex gap-4">
+                        <span class="font-bold text-gray-900 uppercase font-oswald text-sm">COMPARTIR:</span>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 font-bold text-sm uppercase">Facebook</a>
+                        <a href="#" class="text-sky-500 hover:text-sky-700 font-bold text-sm uppercase">X (Twitter)</a>
+                        <a href="#" class="text-green-600 hover:text-green-800 font-bold text-sm uppercase">WhatsApp</a>
+                    </div>
+                </article>
+                
+                <!-- BARRA LATERAL ESTÁTICA PARA MONETIZACIÓN (SIDEBAR) (30%) -->
+                <aside class="w-full lg:w-[30%]">
+                    <div class="sticky top-6">
+                        
+                        <!-- WIDGET ADSENSE GIGANTE (STICKY) -->
+                        <div class="mb-8">
+                            <AdsenseUnit format="auto" />
+                        </div>
+                        
+                        <!-- WIDGET LO MÁS VISTO -->
+                        <div class="bg-blue-900 text-white p-8 shadow-lg border-b-[6px] border-red-600">
+                            <h3 class="font-oswald text-2xl font-extrabold uppercase mb-6 tracking-wide border-b border-blue-800 pb-3 text-red-500">Más Leídas</h3>
+                            <ul class="space-y-5">
+                                {recentPosts && recentPosts.map((recent) => (
+                                    <li class="pb-2">
+                                        <span class="text-xs text-blue-300 uppercase tracking-widest font-bold mb-1 block">{getCategoryName(recent)}</span>
+                                        <a href={`/${recent.slug}`} class="hover:text-red-400 font-bold text-sm uppercase leading-snug font-oswald tracking-wide transition line-clamp-2" set:html={recent.title}></a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </aside>
+
+            </div>
+        ) : (
+            <!-- VISTA DE CATEGORÍA -->
+            <div>
+                <div class="bg-white p-8 md:p-12 shadow-lg border-t-8 border-blue-900 mb-12">
+                    <h1 class="text-4xl md:text-5xl font-extrabold uppercase font-oswald text-gray-900 tracking-tighter mb-4">
+                        Noticias de <span class="text-red-600">{category.name}</span>
+                    </h1>
+                    <p class="text-gray-600 font-open text-lg">Últimas actualizaciones, resultados y reportajes exclusivos.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    {category.posts && category.posts.nodes.map((catPost) => (
+                        <article class="bg-white shadow-lg flex flex-col group border-t-2 border-slate-200 hover:border-red-600 transition-colors">
+                            <div class="relative h-48 overflow-hidden">
+                                <img 
+                                    src={getFeaturedImage(catPost)} 
+                                    alt="Thumb" 
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <span class="absolute top-0 right-0 bg-blue-900 text-white px-2 py-1 text-[10px] font-bold uppercase m-3 tracking-widest">
+                                    {category.name}
+                                </span>
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col text-center">
+                                <h3 class="text-xl font-bold uppercase leading-tight mb-3 line-clamp-2 hover:text-red-600 transition-colors font-oswald tracking-wide">
+                                    <a href={`/${catPost.slug}`} set:html={catPost.title}></a>
+                                </h3>
+                                <div class="text-gray-600 text-sm line-clamp-3 mb-4 mx-auto font-open leading-relaxed" set:html={catPost.excerpt}></div>
+                                <div class="mt-auto">
+                                    <span class="text-xs text-gray-400 font-bold uppercase tracking-widest px-4 border-t border-gray-100 pt-3 block mt-2">Seguir Leyendo &rarr;</span>
+                                </div>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+                
+                {(!category.posts || category.posts.nodes.length === 0) && (
+                    <div class="text-center py-16 bg-white shadow-sm font-bold uppercase tracking-widest text-gray-400">
+                        No hay noticias en esta sección todavía.
+                    </div>
+                )}
+            </div>
+        )}
+	</div>
+
+</Layout>

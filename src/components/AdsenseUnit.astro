@@ -1,0 +1,46 @@
+---
+// AdsenseUnit.astro
+// Componente Reutilizable para insertar bloques de anuncio de Google AdSense
+export interface Props {
+    className?: string;
+    slotId?: string;       // El data-ad-slot que te da Google
+    format?: 'auto' | 'fluid' | 'rectangle'; // Formato del bloque
+    layoutKey?: string;    // Para in-article ads (-gw-3+c-2z etc)
+}
+
+const { 
+    className = "my-8 flex justify-center w-full", 
+    slotId = import.meta.env.ADSENSE_DEFAULT_SLOT || "1234567890", 
+    format = 'auto',
+    layoutKey
+} = Astro.props;
+
+// Usamos el ID del cliente del .env, o uno de prueba si no existe
+const clientId = import.meta.env.ADSENSE_CLIENT_ID || "ca-pub-0000000000000000";
+const isDev = import.meta.env.DEV;
+---
+
+<div class={className}>
+    {isDev ? (
+        <div class="w-full bg-gray-100 py-6 flex flex-col justify-center items-center border border-gray-300 border-dashed min-h-[90px] rounded text-center">
+            <span class="text-gray-400 font-bold uppercase text-xs tracking-widest block mb-1">
+                [ ADSENSE PLACEHOLDER ]
+            </span>
+            <span class="text-gray-400 text-[10px] font-mono">
+                Slot: {slotId} | Format: {format}
+            </span>
+        </div>
+    ) : (
+        <ins class="adsbygoogle"
+             style="display:block; text-align:center;"
+             data-ad-layout="in-article"
+             data-ad-format={format}
+             data-ad-client={clientId}
+             data-ad-slot={slotId}
+             {...(layoutKey && { "data-ad-layout-key": layoutKey })}>
+        </ins>
+        <script is:inline>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    )}
+</div>

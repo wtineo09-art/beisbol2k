@@ -1,0 +1,56 @@
+---
+// Slider Horizontal de Equipos (Pills Design)
+// Toma iterativamente ID de equipos para cargar el SVG oficial estático de las Grandes Ligas directamente.
+
+const teams = [
+    { name: 'Yankees', id: 147, slug: 'yankees-de-nueva-york' },
+    { name: 'Dodgers', id: 119, slug: 'dodgers-de-los-angeles' },
+    { name: 'Red Sox', id: 111, slug: 'medias-rojas-de-boston' },
+    { name: 'Astros', id: 117, slug: 'astros-de-houston' },
+    { name: 'Braves', id: 144, slug: 'bravos-de-atlanta' },
+    { name: 'Mets', id: 121, slug: 'mets-de-nueva-york' },
+    { name: 'Phillies', id: 143, slug: 'filis-de-filadelfia' },
+    { name: 'Padres', id: 135, slug: 'padres-de-san-diego' },
+    { name: 'Cubs', id: 112, slug: 'cachorros-de-chicago' },
+    { name: 'Mariners', id: 136, slug: 'marineros-de-seattle' }
+];
+
+// Endpoint Oficial CDN MLB
+const getLogo = (id) => `https://www.mlbstatic.com/team-logos/team-cap-on-light/${id}.svg`;
+---
+
+<div class="bg-white border-b border-gray-200 shadow-sm py-3 px-2 w-full relative z-40 overflow-hidden">
+    <!-- El contenedor flex-nowrap permite que los botones se queden en una línea horizontal con Scroll -->
+    <div class="max-w-7xl mx-auto flex gap-3 overflow-x-auto whitespace-nowrap hide-scrollbar px-2 pb-1">
+        
+        {teams.map(team => (
+            <a 
+                href={`/mlb-en-vivo/${team.slug}`} 
+                class="inline-flex items-center gap-[6px] px-4 py-[6px] rounded-full border border-gray-200/80 bg-white hover:bg-gray-50 hover:border-gray-300 transition shadow-sm text-[13px] font-bold text-gray-800 tracking-tight font-oswald uppercase"
+            >
+                <img src={getLogo(team.id)} alt={team.name} class="w-5 h-5 object-contain" />
+                {team.name}
+            </a>
+        ))}
+        
+        <a 
+            href="/mlb-en-vivo" 
+            class="inline-flex items-center justify-center px-4 py-[6px] rounded-full border border-gray-200 bg-gray-50 hover:bg-gray-100 transition shadow-sm text-[13px] font-bold text-gray-500 tracking-tight font-oswald uppercase"
+        >
+            MÁS EQUIPOS
+        </a>
+
+    </div>
+</div>
+
+<style>
+    /* Ocultar barra de desplazamiento para navegadores basados en WebKit (Chrome, Safari) */
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    /* Ocultar para Firefox e IE */
+    .hide-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+</style>

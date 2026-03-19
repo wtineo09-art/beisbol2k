@@ -1,0 +1,67 @@
+---
+import { wpquery } from '../lib/wp.js';
+
+let playerPost = null;
+try {
+  const data = await wpquery({
+    query: `
+      query GetPlayerOfTheWeek {
+        posts(first: 1, where: { tag: "jugador-de-la-semana" }) {
+          nodes {
+            title
+            slug
+            excerpt
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
+    `
+  });
+  playerPost = data?.posts?.nodes?.[0] || null;
+} catch (e) {
+  console.error("Error fetching Player of the Week", e);
+}
+
+// Helper para extraer imagen
+function getFeaturedImage(post) {
+  return post?.featuredImage?.node?.sourceUrl || 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2069&auto=format&fit=crop';
+}
+---
+
+{playerPost && (
+  <div class="w-full bg-gradient-to-r from-blue-900 via-gray-900 to-black rounded-lg overflow-hidden shadow-2xl mb-12 flex flex-col md:flex-row relative border-l-8 border-red-600">
+    <!-- Decoración de fondo -->
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2069&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-overlay pointer-events-none"></div>
+
+    <!-- Imagen del Jugador (Izquierda) -->
+    <div class="md:w-2/5 h-64 md:h-auto relative z-10">
+      <img src={getFeaturedImage(playerPost)} alt={playerPost.title} class="w-full h-full object-cover object-top" />
+      <div class="absolute bg-gradient-to-t md:bg-gradient-to-r from-black/80 md:from-black/90 to-transparent inset-0"></div>
+    </div>
+
+    <!-- Contenido (Derecha) -->
+    <div class="md:w-3/5 p-8 md:p-10 flex flex-col justify-center relative z-10">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+          Galardón Semanal
+        </span>
+      </div>
+      
+      <h2 class="text-4xl md:text-5xl font-extrabold font-oswald text-white uppercase leading-none mb-2 tracking-tighter">
+        Jugador de la <span class="text-blue-400">Semana</span>
+      </h2>
+      
+      <h3 class="text-2xl font-bold text-gray-200 mb-4 font-open line-clamp-1" set:html={playerPost.title}></h3>
+      
+      <div class="text-gray-400 text-sm md:text-base leading-relaxed mb-6 font-open line-clamp-3" set:html={playerPost.excerpt}></div>
+      
+      <a href={`/${playerPost.slug}`} class="bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-widest text-sm px-8 py-3 w-fit transition-all shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:-translate-y-1">
+        Ver Estadísticas y Detalles
+      </a>
+    </div>
+  </div>
+)}

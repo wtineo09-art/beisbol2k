@@ -1,0 +1,43 @@
+---
+// Componente Header Principal (Estilo Oscuro con Botón EN VIVO)
+---
+
+<header class="w-full font-oswald text-white shadow-xl relative z-50">
+  <!-- Sección Superior: Logo Centrado -->
+  <div class="bg-black py-8 flex justify-center items-center border-[2px] border-b-gray-900">
+    <a href="/" class="flex flex-col items-center group transition-transform hover:scale-105">
+      <img src="https://html.beisbol2k.com/wp-content/uploads/2025/03/200.png" alt="Béisbol2K" class="h-16 md:h-24 object-contain drop-shadow-md" />
+    </a>
+  </div>
+
+  <!-- Sección Inferior: Navegación -->
+  <div class="bg-[#0a0a0a] border-b-[4px] border-[#0a0a0a]">
+    <div class="flex flex-col md:flex-row justify-center md:justify-center items-center w-full relative">
+      
+      <!-- Enlaces de Navegación -->
+      <nav class="flex space-x-6 md:space-x-10 items-center text-[13px] font-bold tracking-widest uppercase overflow-x-auto w-full md:w-auto px-4 py-2 md:py-0 hide-scrollbar justify-center">
+        <a href="/" class="text-white hover:text-red-500 transition-colors py-3 md:py-4">Inicio</a>
+        <a href="/" class="text-gray-300 hover:text-red-500 transition-colors py-3 md:py-4">Noticias</a>
+        <a href="/" class="text-gray-300 hover:text-red-500 transition-colors py-3 md:py-4">Resultados</a>
+        <a href="/" class="text-gray-300 hover:text-red-500 transition-colors py-3 md:py-4">Partidos</a>
+      </nav>
+
+      <!-- Botón EN VIVO y Búsqueda (Alineados a la derecha en Desktop) -->
+      <div class="flex items-center w-full md:w-auto justify-between md:justify-start bg-black/30 md:bg-transparent md:absolute md:right-0 md:h-full">
+        <a href="/mlb-en-vivo" class="bg-[#ff0000] hover:bg-red-700 text-white font-extrabold uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 px-8 h-full min-h-[48px] md:min-h-full transition-colors w-full md:w-auto">
+          <span class="w-[10px] h-[10px] bg-[#ff8888] rounded-full border-2 border-white shadow-[0_0_8px_#fff] animate-pulse"></span>
+          EN VIVO
+        </a>
+        <button class="text-white hover:text-gray-300 px-6 hidden md:block">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<style>
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

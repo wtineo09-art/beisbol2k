@@ -1,0 +1,79 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdsenseUnit from '../../components/AdsenseUnit.astro';
+import { mlbTeams } from '../../data/mlbTeams.js';
+
+const title = "Ver MLB en Vivo | Todos los Partidos y Equipos - Béisbol2K";
+const description = "Disfruta de la emoción del béisbol de las Grandes Ligas completamente en vivo. Selecciona tu equipo favorito y no te pierdas ni un solo pitcheo.";
+---
+
+<Layout title={title}>
+    <!-- SEO Meta Tags for Hub -->
+    <Fragment slot="head">
+        <meta name="description" content={description} />
+    </Fragment>
+
+    <div class="max-w-7xl mx-auto px-4 py-12 border-t-4 border-red-600">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-extrabold uppercase font-oswald text-blue-900 tracking-tighter mb-4">
+                Transmisiones <span class="text-red-600">MLB EN VIVO</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto font-open">
+                {description}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {mlbTeams.map(team => (
+                <a href={`/mlb-en-vivo/${team.slug}`} class="bg-white shadow-md hover:shadow-xl border-t-4 border-blue-900 hover:border-red-600 transition-all duration-300 p-6 flex flex-col items-center text-center group rounded-b-md">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400 group-hover:bg-blue-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tv group-hover:text-blue-900"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    </div>
+                    <h2 class="font-bold text-gray-800 uppercase text-sm group-hover:text-red-600 transition-colors">{team.name}</h2>
+                    <span class="mt-4 text-[10px] text-white bg-blue-900 px-4 py-2 font-bold uppercase tracking-widest group-hover:bg-red-600 transition-colors">Ver Juego</span>
+                </a>
+            ))}
+        </div>
+        
+        <!-- ESPACIO VIP PARA ADSENSE INFERIOR EN HUB -->
+        <AdsenseUnit format="auto" className="mt-12 mb-16 flex justify-center w-full max-w-7xl mx-auto" />
+
+        <!-- BLOQUE SEO (CONTENIDO DE VALOR PARA BUSCADORES) -->
+        <div class="bg-white p-8 md:p-12 shadow-lg border-t-8 border-blue-900 rounded-b-md">
+            
+            <h2 class="text-3xl font-extrabold uppercase font-oswald text-gray-900 mb-6 border-b-2 border-red-600 pb-2 inline-block">Ver Juegos de MLB en Vivo: Tu Mejor Opción</h2>
+            
+            <div class="prose prose-lg max-w-none text-gray-700 font-open leading-relaxed">
+                <p>
+                    Si buscas <strong>ver juegos de MLB en vivo</strong> y seguir de cerca a tus equipos favoritos como los Yankees de Nueva York, Dodgers de Los Ángeles, Red Sox, Astros de Houston y muchos más, ¡has llegado al lugar correcto! En nuestra página encontrarás de forma gratuita todo lo que necesitas para disfrutar del béisbol de las Grandes Ligas en tiempo real.
+                </p>
+
+                <h3 class="text-2xl font-bold uppercase font-oswald text-blue-900 mt-8 mb-4">Transmisiones en Alta Calidad</h3>
+                <p>
+                    Disfruta de partidos en <strong>HD y sin cortes</strong>. Contamos con múltiples reportes de transmisión para que vivas la emoción del béisbol como si estuvieras en el propio estadio de tu equipo, ya sea en la temporada regular, durante los playoffs, o la emocionante Serie Mundial.
+                </p>
+
+                <h3 class="text-2xl font-bold uppercase font-oswald text-blue-900 mt-8 mb-4">Acceso Fácil y Rápido</h3>
+                <p>
+                    No importa de qué parte del mundo nos visites. Solo necesitas una conexión a internet y podrás ver los juegos en tu dispositivo favorito: teléfono móvil, tablet, ordenador PC o Smart TV. Nuestros videos y enlaces de transmisiones se ajustan a cualquier pantalla para tu comodidad total.
+                </p>
+
+                <div class="bg-gray-50 p-6 border-l-4 border-red-600 my-8">
+                    <h3 class="text-xl font-bold uppercase font-oswald text-gray-900 mb-2">Totalmente Gratuito</h3>
+                    <p class="mb-0">
+                        <strong>No se requiere pago</strong>, no hay suscripciones ocultas. Nuestro compromiso es brindarte la mejor experiencia de transmisión donde puedes venir a relajarte y ver el béisbol en vivo de forma gratuita en la comunidad de Béisbol2K.
+                    </p>
+                </div>
+
+                <h3 class="text-2xl font-bold uppercase font-oswald text-blue-900 mt-8 mb-4">¿Por Qué Usar Béisbol2K Para Ver La MLB?</h3>
+                <p>
+                    A diferencia de otros sitios lentos o llenos de ventanas emergentes, Béisbol2K trabaja día a día para que la experiencia visual sea impecable. Sumado a las <em>últimas noticias</em> y nuestras tablas de récords, nos posicionamos como el hogar virtual para los fanáticos intransigentes de la pelota caliente.
+                </p>
+                <p>
+                    <em>Aviso legal: Los transmisiones están alojadas en sitios externos e incrustados aquí. Nosotros no transmitimos, solo proveemos facilidad de acceso vinculando el contenido.</em>
+                </p>
+            </div>
+            
+        </div>
+    </div>
+</Layout>

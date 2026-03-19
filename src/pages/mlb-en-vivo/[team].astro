@@ -1,0 +1,258 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { mlbTeams } from '../../data/mlbTeams.js';
+import AdsenseUnit from '../../components/AdsenseUnit.astro';
+import { wpquery } from '../../lib/wp.js';
+
+export async function getStaticPaths() {
+    // Obtenemos los últimos 50 posts de la categoría "En Vivo" (slug: "en-vivo")
+    // O si la categoría no existe aún, simplemente traemos 100 posts recientes para encontrar las transmisiones.
+    // Usaremos una consulta amplia y filtraremos en Astro por el slug para mayor seguridad.
+    let livePosts = [];
+    try {
+        const data = await wpquery({
+            query: `
+                query GetLivePosts {
+                    posts(first: 100) {
+                        nodes {
+                            slug
+                            title
+                            content
+                            date
+                        }
+                    }
+                }
+            `
+        });
+        livePosts = data?.posts?.nodes || [];
+    } catch (e) {
+        console.error("No se pudo obtener transmisiones de WP", e);
+    }
+
+    // Retornamos SIEMPRE las 30 rutas de los equipos de MLB, pase lo que pase en WP.
+    return mlbTeams.map((team) => {
+        // Encontrar el post correspondiente a este equipo. 
+        // El slug del post en WordPress debe ser idéntico al slug del equipo en Astro.
+        const wpData = livePosts.find(post => post.slug === team.slug);
+
+        return {
+            params: { team: team.slug },
+            props: { team, wpData }
+        };
+    });
+}
+
+const { team, wpData } = Astro.props;
+
+// Fetch related news (Noticias) taggeadas con el slug del equipo.
+let relatedNews = [];
+try {
+    const data = await wpquery({
+        query: `
+            query GetTeamNews($tag: String!) {
+                posts(first: 3, where: { tag: $tag }) {
+                    nodes {
+                        title
+                        slug
+                        date
+                        featuredImage {
+                            node {
+                                sourceUrl
+                            }
+                        }
+                    }
+                }
+            }
+        `,
+        variables: { tag: team.slug }
+    });
+    relatedNews = data?.posts?.nodes || [];
+} catch (e) {
+    console.error("Error fetching related news", e);
+}
+
+// Helper para extraer la imagen de GraphQL
+function getFeaturedImage(post) {
+  return post?.featuredImage?.node?.sourceUrl || 'https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop';
+}
+
+// Construcción de títulos SEO
+const title = `Ver Juego de ${team.name} en Vivo Hoy - Transmisión MLB - Béisbol2K`;
+const metaDescription = `Sigue la transmisión en vivo del partido de los ${team.name} hoy. Disfruta el mejor béisbol de las Grandes Ligas minuto a minuto.`;
+---
+
+<Layout title={title}>
+    <Fragment slot="head">
+        <meta name="description" content={metaDescription} />
+    </Fragment>
+
+    <div class="bg-gray-900 text-white py-12 border-b-[6px] border-red-600 shadow-inner relative overflow-hidden">
+        <!-- Decoración de fondo -->
+        <div class="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
+        <div class="absolute inset-0 bg-blue-900/40 mix-blend-multiply"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <span class="text-red-500 font-extrabold uppercase tracking-widest text-sm mb-3 block bg-white/10 inline-block px-4 py-1 rounded-full backdrop-blur-sm">Transmisión Oficial Béisbol2K</span>
+            <h1 class="text-4xl md:text-6xl font-extrabold uppercase font-oswald tracking-tighter leading-tight">
+                Ver Juego de <span class="text-blue-400">{team.name}</span> en Vivo
+            </h1>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-12 flex flex-col lg:flex-row gap-10">
+        
+        <!-- Contenido de Video (70%) -->
+        <main class="w-full lg:w-[70%]">
+            
+            <!-- ESPACIO ADSENSE - ABOVE PLAYER -->
+            <AdsenseUnit format="auto" className="mb-8 flex justify-center w-full" />
+
+            <!-- Contenedor del Reproductor -->
+            <div class="bg-black aspect-video flex flex-col items-center justify-center relative shadow-2xl border-[8px] border-gray-800 rounded-lg overflow-hidden group">
+                {wpData ? (
+                    <div class="w-full h-full text-white content-iframe-wrapper relative z-10" set:html={wpData.content}></div>
+                ) : (
+                    <div class="text-center p-8 relative z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video-off mx-auto mb-4 text-gray-500"><path d="M10.66 6H14a2 2 0 0 1 2 2v2.5l5.248-3.062A.5.5 0 0 1 22 7.869v8.261"/><path d="M16 16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l10 10Z"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        <h2 class="text-3xl font-oswald uppercase text-gray-300 mb-2 font-bold tracking-tight">Transmisión No Disponible</h2>
+                        <p class="text-gray-500 max-w-md mx-auto">Aún no hemos publicado el enlace para el partido de hoy de los {team.name}. Vuelve pronto al inicio del encuentro o actualiza la página.</p>
+                        
+                        <button onclick="window.location.reload()" class="mt-6 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white px-6 py-2 uppercase font-bold tracking-widest transition-colors">
+                            Recargar Página
+                        </button>
+                    </div>
+                )}
+                
+                <!-- Efecto visual decorativo detrás del video si no carga completo -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/20 to-red-600/20 mix-blend-overlay pointer-events-none"></div>
+            </div>
+
+            <!-- ESPACIO ADSENSE - BELOW PLAYER -->
+            <AdsenseUnit format="auto" className="mt-8 mb-4 flex justify-center w-full" />
+
+            <!-- Párrafo SEO Contextual + Ficha Informativa del Equipo -->
+            <div class="mt-10 bg-white shadow-lg border-t-8 border-blue-900 rounded-b-md overflow-hidden">
+                <div class="p-8">
+                    <h3 class="font-oswald text-2xl font-extrabold uppercase text-gray-900 mb-4 border-b pb-3 tracking-wide">Transmisión de {team.name}</h3>
+                    
+                    {wpData ? (
+                        <div class="text-gray-700 font-open mb-6 bg-gray-50 p-4 rounded-md border-l-4 border-green-500">
+                            <p class="flex items-center gap-3 text-sm text-gray-600 font-bold">
+                                <span class="relative flex h-3 w-3">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+                                Enlace validado para hoy: {new Date(wpData.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}
+                            </p>
+                        </div>
+                    ) : (
+                        <div class="text-gray-700 font-open mb-6 bg-gray-50 p-4 rounded-md border-l-4 border-yellow-500">
+                            <p class="flex items-center gap-3 text-sm text-gray-600 font-bold">
+                                ⚠️ Verificando enlaces para este equipo.
+                            </p>
+                        </div>
+                    )}
+                    
+                    <p class="text-base text-gray-700 leading-relaxed font-open mb-6">
+                        Sigue en vivo toda la acción y resultados actualizados de la temporada y playoffs de la MLB. Aquí en Béisbol2K te traemos la transmisión online de los <strong>{team.name}</strong> completamente en vivo por internet, de manera ininterrumpida y en alta calidad.
+                    </p>
+                </div>
+
+                <!-- Datos Estratégicos del Equipo (Generación SEO Dinámica) -->
+                <div class="bg-gray-100 p-8 border-t border-gray-200">
+                    <h4 class="font-oswald text-xl font-bold uppercase text-red-600 mb-6">Información de la Franquicia: {team.name}</h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="flex items-start gap-4 bg-white p-4 rounded-md shadow-sm">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-900"><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3.96 3.152a1 1 0 0 0-.21 1.411l2 2.5a1 1 0 0 0 1.56.096L18.49 14"/></svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-gray-400 uppercase font-bold tracking-widest">Liga y División</span>
+                                <span class="block text-gray-900 font-bold">{team.league} <br/> División {team.division}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 bg-white p-4 rounded-md shadow-sm">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-gray-400 uppercase font-bold tracking-widest">Campeonatos Logrados</span>
+                                <span class="block text-gray-900 font-bold">{team.titles}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 bg-white p-4 rounded-md shadow-sm sm:col-span-2">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-gray-400 uppercase font-bold tracking-widest">Estadio Casa</span>
+                                <span class="block text-gray-900 font-bold">{team.stadium}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 prose max-w-none text-gray-600 font-open text-sm">
+                        <p>
+                            Formando parte de la prestigiosa <strong>{team.league}</strong> de las Grandes Ligas de Béisbol (MLB), los <strong>{team.name}</strong> libran intensas batallas en la División {team.division}. Cada juego en casa disputado en el mítico <strong>{team.stadium}</strong> es una oportunidad para agregar una victoria más a su grandiosa historia, la cual ya ostenta <em>{team.titles}</em>.
+                        </p>
+                        <p>
+                            No importa si los juegos son transmitidos localmente o de manera nacional; si la transmisión no está en tu área, ¡búscala aquí! En Béisbol2K agrupamos todas las opciones para que puedas ver el partido cómodamente y sin suscripciones dolorosas. Acompaña a tus jugadores favoritos en su lucha diaria por alcanzar la emblemática Serie Mundial.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+            
+        </main>
+
+        <!-- Sidebar Lateral (30%) -->
+        <aside class="w-full lg:w-[30%]">
+            <div class="flex flex-col gap-8">
+                
+                {relatedNews.length > 0 && (
+                    <div class="bg-blue-900 text-white p-8 shadow-lg border-b-[6px] border-red-600 rounded-md">
+                        <h3 class="font-oswald text-2xl font-extrabold uppercase mb-6 tracking-wide border-b border-blue-800 pb-3 text-red-500">Noticias del Equipo</h3>
+                        <ul class="space-y-5">
+                            {relatedNews.map((news) => (
+                                <li class="pb-2">
+                                    <span class="text-xs text-blue-300 uppercase tracking-widest font-bold mb-2 block border-b border-blue-800/50 pb-1 w-max">Última Hora</span>
+                                    <div class="flex gap-4 items-center">
+                                        <div class="w-16 h-16 shrink-0 rounded-sm overflow-hidden border border-blue-800">
+                                            <img src={getFeaturedImage(news)} alt="News" class="w-full h-full object-cover" />
+                                        </div>
+                                        <a href={`/${news.slug}`} class="hover:text-red-400 font-bold text-sm leading-snug font-oswald tracking-wide transition line-clamp-3" set:html={news.title}></a>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                <div class="sticky top-6 flex flex-col gap-8">
+                    <!-- WIDGET ADSENSE LATERAL -->
+                    <div class="mb-4">
+                        <AdsenseUnit format="auto" />
+                    </div>
+
+                    <a href="/mlb-en-vivo" class="block bg-blue-900 text-white text-center py-5 rounded-md font-bold uppercase tracking-widest hover:bg-red-600 hover:-translate-y-1 transition-all shadow-lg text-sm">
+                        &larr; Ver Lista de Equipos
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+</Layout>
+
+<style is:global>
+    /* Estilos para forzar que los iframes importados de WP sean responsivos */
+    .content-iframe-wrapper iframe {
+        width: 100% !important;
+        height: 100% !important;
+        aspect-ratio: 16 / 9;
+        border: none;
+    }
+</style>

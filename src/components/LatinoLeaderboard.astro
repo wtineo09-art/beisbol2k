@@ -1,0 +1,151 @@
+---
+// Widget de "Élite Latina" (Líderes Latinos - Bateo y Pitcheo)
+// Estructura lista para que el editor coloque al líder latino de cada departamento.
+---
+
+<div class="flex flex-col gap-6">
+
+    <!-- LÍDERES BATEADORES -->
+    <div class="bg-gradient-to-br from-blue-900 to-gray-900 border-t-4 border-red-600 shadow-xl overflow-hidden rounded-b-sm">
+        <div class="p-4 flex items-center justify-between border-b border-blue-800">
+            <h3 class="text-lg font-oswald font-extrabold text-white uppercase tracking-wide flex items-center gap-2">
+                🌟 Élite <span class="text-red-500">Latina</span>
+            </h3>
+            <span class="text-[10px] text-blue-300 font-bold uppercase tracking-widest bg-blue-950 px-2 py-1 rounded-sm">BATEO</span>
+        </div>
+
+        <ul class="flex flex-col text-sm font-open">
+            
+            <!-- Bateo (AVG) -->
+            <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default relative overflow-hidden">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition z-10">AVG</span>
+                <div class="flex-grow z-10">
+                    <p class="font-bold text-white uppercase leading-tight">Juan Soto</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">NYY</p>
+                </div>
+                <div class="text-right z-10">
+                    <p class="text-blue-400 font-oswald font-bold text-lg leading-none">.330</p>
+                </div>
+            </li>
+
+            <!-- Jonrones (HR) -->
+            <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">HR</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">M. Ozuna</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">ATL</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-oswald font-bold text-lg leading-none">45</p>
+                </div>
+            </li>
+
+            <!-- Empujadas (RBI) -->
+            <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">RBI</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">J. Ramirez</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">CLE</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-oswald font-bold text-lg leading-none">105</p>
+                </div>
+            </li>
+
+            <!-- Hits (H) -->
+            <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">HITS</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">L. Arraez</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">SD</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-oswald font-bold text-lg leading-none">200</p>
+                </div>
+            </li>
+
+            <!-- Anotadas (R) -->
+            <li class="flex items-center p-3 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">R</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">R. Acuña Jr</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">ATL</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-oswald font-bold text-lg leading-none">120</p>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+
+    <!-- Widget AdSense 300x250 Intercalado -->
+    <div class="bg-gray-200 w-full h-[250px] flex items-center justify-center border-2 border-gray-300 border-dashed shadow-sm">
+        <span class="text-gray-400 font-bold uppercase text-xs tracking-widest text-center px-4">
+            [ ADSENSE - 300x250 ]
+        </span>
+    </div>
+
+    <!-- LÍDERES LANZADORES -->
+    <div class="bg-gradient-to-br from-gray-900 to-black border-t-4 border-blue-600 shadow-xl overflow-hidden rounded-b-sm">
+        <div class="p-4 flex items-center justify-between border-b border-gray-800">
+            <h3 class="text-lg font-oswald font-extrabold text-white uppercase tracking-wide flex items-center gap-2">
+                🔥 Ases <span class="text-blue-500">Latinos</span>
+            </h3>
+            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest bg-gray-800 px-2 py-1 rounded-sm">PITCHEO</span>
+        </div>
+
+        <ul class="flex flex-col text-sm font-open">
+            
+            <!-- Entradas Lanzadas (IP) -->
+            <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">IP</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">F. Valdez</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">HOU</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-oswald font-bold text-lg leading-none">198.0</p>
+                </div>
+            </li>
+
+            <!-- Ponches (K) -->
+            <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">K</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">P. Lopez</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">MIN</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-red-400 font-oswald font-bold text-lg leading-none">234</p>
+                </div>
+            </li>
+
+            <!-- Boletos (BB) -->
+            <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">BB</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">E. Perez</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">MIA</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-oswald font-bold text-lg leading-none">25</p>
+                </div>
+            </li>
+
+            <!-- Ganados (W) -->
+            <li class="flex items-center p-3 hover:bg-gray-800/60 transition group cursor-default">
+                <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">W</span>
+                <div class="flex-grow">
+                    <p class="font-bold text-white uppercase leading-tight">L. Castillo</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">SEA</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-blue-400 font-oswald font-bold text-lg leading-none">16</p>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+
+</div>
