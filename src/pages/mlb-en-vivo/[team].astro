@@ -133,34 +133,8 @@ const metaDescription = `Sigue la transmisión en vivo del partido de los ${team
         <!-- Contenido de Video (70%) -->
         <main class="w-full lg:w-[70%]">
             
-            <!-- ESPACIO ADSENSE - ABOVE PLAYER -->
-            <AdsenseUnit format="auto" className="mb-8 flex justify-center w-full" />
-
-            <!-- Contenedor del Reproductor -->
-            <div class="bg-black aspect-video flex flex-col items-center justify-center relative shadow-2xl border-[8px] border-gray-800 rounded-lg overflow-hidden group">
-                {wpData ? (
-                    <div class="w-full h-full text-white content-iframe-wrapper relative z-10" set:html={wpData.content}></div>
-                ) : (
-                    <div class="text-center p-8 relative z-10">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video-off mx-auto mb-4 text-gray-500"><path d="M10.66 6H14a2 2 0 0 1 2 2v2.5l5.248-3.062A.5.5 0 0 1 22 7.869v8.261"/><path d="M16 16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l10 10Z"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
-                        <h2 class="text-3xl font-oswald uppercase text-gray-300 mb-2 font-bold tracking-tight">Transmisión No Disponible</h2>
-                        <p class="text-gray-500 max-w-md mx-auto">Aún no hemos publicado el enlace para el partido de hoy de los {team.name}. Vuelve pronto al inicio del encuentro o actualiza la página.</p>
-                        
-                        <button onclick="window.location.reload()" class="mt-6 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white px-6 py-2 uppercase font-bold tracking-widest transition-colors">
-                            Recargar Página
-                        </button>
-                    </div>
-                )}
-                
-                <!-- Efecto visual decorativo detrás del video si no carga completo -->
-                <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/20 to-red-600/20 mix-blend-overlay pointer-events-none"></div>
-            </div>
-
-            <!-- ESPACIO ADSENSE - BELOW PLAYER -->
-            <AdsenseUnit format="auto" className="mt-8 mb-4 flex justify-center w-full" />
-
             <!-- Párrafo SEO Contextual + Ficha Informativa del Equipo -->
-            <div class="mt-10 bg-white shadow-lg border-t-8 border-blue-900 rounded-b-md overflow-hidden">
+            <div class="bg-white shadow-lg border-t-8 border-blue-900 rounded-b-md overflow-hidden">
                 <div class="p-8">
                     <h3 class="font-oswald text-2xl font-extrabold uppercase text-gray-900 mb-4 border-b pb-3 tracking-wide">Transmisión de {team.name}</h3>
                     
@@ -182,9 +156,35 @@ const metaDescription = `Sigue la transmisión en vivo del partido de los ${team
                         </div>
                     )}
                     
-                    <p class="text-base text-gray-700 leading-relaxed font-open mb-6">
+                    <p class="text-base text-gray-700 leading-relaxed font-open mb-8">
                         Sigue en vivo toda la acción y resultados actualizados de la temporada y playoffs de la MLB. Aquí en Béisbol2K te traemos la transmisión online de los <strong>{team.name}</strong> completamente en vivo por internet, de manera ininterrumpida y en alta calidad.
                     </p>
+
+                    <!-- ESPACIO ADSENSE - ABOVE PLAYER -->
+                    <AdsenseUnit format="auto" className="mb-8 flex justify-center w-full" />
+
+                    <!-- Contenedor del Reproductor -->
+                    <div class="bg-black aspect-video flex flex-col items-center justify-center relative shadow-2xl border-[8px] border-gray-800 rounded-lg overflow-hidden group">
+                        {wpData ? (
+                            <div class="w-full h-full text-white content-iframe-wrapper relative z-10" set:html={wpData.content}></div>
+                        ) : (
+                            <div class="text-center p-8 relative z-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video-off mx-auto mb-4 text-gray-500"><path d="M10.66 6H14a2 2 0 0 1 2 2v2.5l5.248-3.062A.5.5 0 0 1 22 7.869v8.261"/><path d="M16 16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l10 10Z"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                                <h2 class="text-3xl font-oswald uppercase text-gray-300 mb-2 font-bold tracking-tight">Transmisión No Disponible</h2>
+                                <p class="text-gray-500 max-w-md mx-auto">Aún no hemos publicado el enlace para el partido de hoy de los {team.name}. Vuelve pronto al inicio del encuentro o actualiza la página.</p>
+                                
+                                <button onclick="window.location.reload()" class="mt-6 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white px-6 py-2 uppercase font-bold tracking-widest transition-colors">
+                                    Recargar Página
+                                </button>
+                            </div>
+                        )}
+                        
+                        <!-- Efecto visual decorativo detrás del video si no carga completo -->
+                        <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/20 to-red-600/20 mix-blend-overlay pointer-events-none"></div>
+                    </div>
+
+                    <!-- ESPACIO ADSENSE - BELOW PLAYER -->
+                    <AdsenseUnit format="auto" className="mt-8 flex justify-center w-full" />
                 </div>
 
                 <!-- Datos Estratégicos del Equipo (Generación SEO Dinámica) -->
