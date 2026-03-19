@@ -71,6 +71,35 @@ try {
     console.error("Error fetching related news", e);
 }
 
+// Fallback: si no hay noticias del equipo, mostrar las 3 últimas noticias generales
+let newsTitle = "Noticias del Equipo";
+if (!relatedNews || relatedNews.length === 0) {
+    try {
+        const fallbackData = await wpquery({
+            query: `
+                query GetLatestNews {
+                    posts(first: 3) {
+                        nodes {
+                            title
+                            slug
+                            date
+                            featuredImage {
+                                node {
+                                    sourceUrl
+                                }
+                            }
+                        }
+                    }
+                }
+            `
+        });
+        relatedNews = fallbackData?.posts?.nodes || [];
+        newsTitle = "Últimas Noticias";
+    } catch (e) {
+        console.error("Error fetching fallback news", e);
+    }
+}
+
 // Helper para extraer la imagen de GraphQL
 function getFeaturedImage(post) {
   return post?.featuredImage?.node?.sourceUrl || 'https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop';
@@ -212,9 +241,14 @@ const metaDescription = `Sigue la transmisión en vivo del partido de los ${team
         <aside class="w-full lg:w-[30%]">
             <div class="flex flex-col gap-8">
                 
+                <!-- WIDGET ADSENSE SUPERIOR LATERAL (NUEVO REQUERIMIENTO) -->
+                <div class="mb-2">
+                    <AdsenseUnit format="auto" />
+                </div>
+
                 {relatedNews.length > 0 && (
                     <div class="bg-blue-900 text-white p-8 shadow-lg border-b-[6px] border-red-600 rounded-md">
-                        <h3 class="font-oswald text-2xl font-extrabold uppercase mb-6 tracking-wide border-b border-blue-800 pb-3 text-red-500">Noticias del Equipo</h3>
+                        <h3 class="font-oswald text-2xl font-extrabold uppercase mb-6 tracking-wide border-b border-blue-800 pb-3 text-red-500">{newsTitle}</h3>
                         <ul class="space-y-5">
                             {relatedNews.map((news) => (
                                 <li class="pb-2">
