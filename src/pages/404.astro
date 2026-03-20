@@ -1,0 +1,60 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+const title = "Ponchado - Pagina No Encontrada | Beisbol2K";
+---
+
+<Layout title={title}>
+    <div class="min-h-[80vh] flex items-center justify-center py-20 bg-gray-100">
+        <div class="max-w-4xl w-full mx-4 bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row border-t-8 border-red-600">
+            
+            <!-- Imagen Temática -->
+            <div class="md:w-1/2 relative h-64 md:h-auto">
+                <img 
+                    src="https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop" 
+                    alt="Beisbol Strikeout" 
+                    class="absolute inset-0 w-full h-full object-cover"
+                />
+                <div class="absolute inset-0 bg-blue-900/40 flex items-center justify-center">
+                    <span class="text-white font-oswald text-8xl font-black opacity-30 tracking-tighter">404</span>
+                </div>
+            </div>
+
+            <!-- Contenido del Error -->
+            <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-center md:text-left">
+                <h1 class="text-red-600 font-oswald text-5xl md:text-6xl font-black uppercase tracking-tighter mb-4 leading-none">
+                    Ponchado!
+                </h1>
+                <h2 class="text-gray-900 font-oswald text-2xl font-bold uppercase mb-6 tracking-wide underline decoration-red-500 decoration-4 underline-offset-8">
+                    Pagina No Encontrada
+                </h2>
+                <p class="text-gray-600 font-open text-lg mb-10 leading-relaxed">
+                    Lo sentimos, la pagina que buscas no esta en nuestro lineup hoy. Puede que se haya ido de <span class="text-blue-900 font-bold italic">home run</span> o simplemente fue un error de lanzamiento.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="/" class="bg-blue-900 text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-black transition-all text-center shadow-lg group">
+                        <span class="group-hover:translate-x-[-4px] inline-block transition-transform">&larr;</span> Volver al Inicio
+                    </a>
+                    <a href="/partidos-hoy" class="border-2 border-red-600 text-red-600 px-8 py-4 font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all text-center">
+                        Ver Calendario
+                    </a>
+                </div>
+
+                <div class="mt-12 pt-8 border-t border-gray-100">
+                    <p class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-4">Intentas buscar algo mas?</p>
+                    <form action="/buscar" method="GET" class="flex">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            placeholder="Buscar noticias..." 
+                            class="bg-gray-100 border-none px-4 py-3 text-sm focus:ring-2 focus:ring-red-600 focus:outline-none w-full"
+                        />
+                        <button type="submit" class="bg-gray-900 text-white px-6 hover:bg-red-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>
