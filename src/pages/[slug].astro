@@ -229,16 +229,27 @@ const pageTitle = type === 'post' ? `${post.title} | Béisbol2K` : type === 'cat
 
 </Layout>
 <style is:global>
-    /* Forzar que las imágenes dentro del contenido de WP sean responsivas */
-    .prose img {
+    /* Forzar que el contenido de WP sea totalmente responsivo */
+    .prose img, 
+    .prose figure, 
+    .prose iframe, 
+    .prose video {
         max-width: 100% !important;
         height: auto !important;
         display: block;
         margin-left: auto;
         margin-right: auto;
     }
-    /* Asegurar que el contenedor no tenga desbordamiento inesperado */
-    article {
-        overflow-x: hidden;
+
+    /* Quitar anchos fijos que WP inyecta en figuras */
+    .prose figure {
+        width: auto !important;
+    }
+
+    /* Asegurar que las tablas también sean responsivas */
+    .prose table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
     }
 </style>
