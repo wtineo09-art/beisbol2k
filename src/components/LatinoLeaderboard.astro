@@ -1,7 +1,93 @@
 ---
 // Widget de "Élite Latina" (Líderes Latinos - Bateo y Pitcheo)
-// Estructura lista para que el editor coloque al líder latino de cada departamento.
+// Estructura automatizada que consume datos de la API de MLB.
 import AdsenseUnit from './AdsenseUnit.astro';
+
+const LATINO_COUNTRIES = [
+  'Dominican Republic',
+  'Venezuela',
+  'Cuba',
+  'Puerto Rico',
+  'Mexico',
+  'Panama',
+  'Colombia',
+  'Nicaragua',
+  'Curacao'
+];
+
+const TEAM_ABBR: Record<number, string> = {
+    108: 'LAA', 109: 'ARI', 110: 'ATL', 111: 'BOS', 112: 'CHC',
+    113: 'CIN', 114: 'CLE', 115: 'COL', 116: 'DET', 117: 'HOU',
+    118: 'KC', 119: 'LAD', 120: 'WSH', 121: 'NYM', 133: 'OAK',
+    134: 'PIT', 135: 'SD', 136: 'SEA', 137: 'SF', 138: 'STL',
+    139: 'TB', 140: 'TEX', 141: 'TOR', 142: 'MIN', 143: 'PHI',
+    144: 'ATL', 145: 'CWS', 146: 'MIA', 147: 'NYY', 158: 'MIL'
+};
+
+const currentYear = new Date().getFullYear().toString();
+const previousYear = (parseInt(currentYear) - 1).toString();
+
+async function getLatinoLeader(categories: string, group: string) {
+    try {
+        // Primero intentamos con el año actual
+        let url = `https://statsapi.mlb.com/api/v1/stats/leaders?leaderCategories=${categories}&season=${currentYear}&statGroup=${group}&limit=50&hydrate=person(birthCountry)`;
+        let response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        let data = await response.json();
+        
+        // Si no hay líderes para el año actual, intentamos con el año anterior
+        if (!data.leagueLeaders || data.leagueLeaders.length === 0 || data.leagueLeaders.every(cat => cat.leaders.length === 0)) {
+            url = `https://statsapi.mlb.com/api/v1/stats/leaders?leaderCategories=${categories}&season=${previousYear}&statGroup=${group}&limit=100&hydrate=person(birthCountry)`;
+            response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            data = await response.json();
+        }
+
+        const results: Record<string, any> = {};
+        
+        if (data.leagueLeaders) {
+            data.leagueLeaders.forEach((cat: any) => {
+                const latino = cat.leaders.find((l: any) => 
+                    LATINO_COUNTRIES.includes(l.person.birthCountry)
+                );
+                if (latino) {
+                    results[cat.leaderCategory] = {
+                        name: latino.person.fullName,
+                        team: TEAM_ABBR[latino.team.id] || latino.team.name.substring(0, 3).toUpperCase(),
+                        value: latino.value,
+                        rank: latino.rank
+                    };
+                }
+            });
+        }
+        return results;
+    } catch (e) {
+        console.error(`Error fetching MLB ${group} leaders:`, e);
+        return {};
+    }
+}
+
+const hittingLeaders = await getLatinoLeader('battingAverage,homeRuns,runsBattedIn,hits,runs', 'hitting');
+const pitchingLeaders = await getLatinoLeader('inningsPitched,strikeouts,baseOnBalls,wins', 'pitching');
+
+// Fallbacks estáticos si la API falla o no hay datos
+const defaultHitting = {
+    battingAverage: { name: 'Juan Soto', team: 'NYY', value: '.330' },
+    homeRuns: { name: 'M. Ozuna', team: 'ATL', value: '45' },
+    runsBattedIn: { name: 'J. Ramirez', team: 'CLE', value: '105' },
+    hits: { name: 'L. Arraez', team: 'SD', value: '200' },
+    runs: { name: 'R. Acuña Jr', team: 'ATL', value: '120' }
+};
+
+const defaultPitching = {
+    inningsPitched: { name: 'F. Valdez', team: 'HOU', value: '198.0' },
+    strikeouts: { name: 'P. Lopez', team: 'MIN', value: '234' },
+    baseOnBalls: { name: 'E. Perez', team: 'MIA', value: '25' },
+    wins: { name: 'L. Castillo', team: 'SEA', value: '16' }
+};
+
+const h = { ...defaultHitting, ...hittingLeaders };
+const p = { ...defaultPitching, ...pitchingLeaders };
 ---
 
 <div class="flex flex-col gap-6">
@@ -21,11 +107,13 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default relative overflow-hidden">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition z-10">AVG</span>
                 <div class="flex-grow z-10">
-                    <p class="font-bold text-white uppercase leading-tight">Juan Soto</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">NYY</p>
+                    <p class="font-bold text-white uppercase leading-tight">{h.battingAverage.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{h.battingAverage.team}</p>
                 </div>
                 <div class="text-right z-10">
-                    <p class="text-blue-400 font-oswald font-bold text-lg leading-none">.330</p>
+                    <p class="text-blue-400 font-oswald font-bold text-lg leading-none">
+                        {h.battingAverage.value.toString().startsWith('.') ? h.battingAverage.value : `.${h.battingAverage.value}`}
+                    </p>
                 </div>
             </li>
 
@@ -33,11 +121,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">HR</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">M. Ozuna</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">ATL</p>
+                    <p class="font-bold text-white uppercase leading-tight">{h.homeRuns.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{h.homeRuns.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-white font-oswald font-bold text-lg leading-none">45</p>
+                    <p class="text-white font-oswald font-bold text-lg leading-none">{h.homeRuns.value}</p>
                 </div>
             </li>
 
@@ -45,11 +133,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">RBI</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">J. Ramirez</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">CLE</p>
+                    <p class="font-bold text-white uppercase leading-tight">{h.runsBattedIn.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{h.runsBattedIn.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-white font-oswald font-bold text-lg leading-none">105</p>
+                    <p class="text-white font-oswald font-bold text-lg leading-none">{h.runsBattedIn.value}</p>
                 </div>
             </li>
 
@@ -57,11 +145,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">HITS</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">L. Arraez</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">SD</p>
+                    <p class="font-bold text-white uppercase leading-tight">{h.hits.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{h.hits.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-white font-oswald font-bold text-lg leading-none">200</p>
+                    <p class="text-white font-oswald font-bold text-lg leading-none">{h.hits.value}</p>
                 </div>
             </li>
 
@@ -69,11 +157,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-red-500 transition">R</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">R. Acuña Jr</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">ATL</p>
+                    <p class="font-bold text-white uppercase leading-tight">{h.runs.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{h.runs.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-white font-oswald font-bold text-lg leading-none">120</p>
+                    <p class="text-white font-oswald font-bold text-lg leading-none">{h.runs.value}</p>
                 </div>
             </li>
 
@@ -98,11 +186,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">IP</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">F. Valdez</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">HOU</p>
+                    <p class="font-bold text-white uppercase leading-tight">{p.inningsPitched.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{p.inningsPitched.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-white font-oswald font-bold text-lg leading-none">198.0</p>
+                    <p class="text-white font-oswald font-bold text-lg leading-none">{p.inningsPitched.value}</p>
                 </div>
             </li>
 
@@ -110,11 +198,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">K</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">P. Lopez</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">MIN</p>
+                    <p class="font-bold text-white uppercase leading-tight">{p.strikeouts.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{p.strikeouts.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-red-400 font-oswald font-bold text-lg leading-none">234</p>
+                    <p class="text-red-400 font-oswald font-bold text-lg leading-none">{p.strikeouts.value}</p>
                 </div>
             </li>
 
@@ -122,11 +210,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 border-b border-gray-800/50 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">BB</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">E. Perez</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">MIA</p>
+                    <p class="font-bold text-white uppercase leading-tight">{p.baseOnBalls.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{p.baseOnBalls.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-white font-oswald font-bold text-lg leading-none">25</p>
+                    <p class="text-white font-oswald font-bold text-lg leading-none">{p.baseOnBalls.value}</p>
                 </div>
             </li>
 
@@ -134,11 +222,11 @@ import AdsenseUnit from './AdsenseUnit.astro';
             <li class="flex items-center p-3 hover:bg-gray-800/60 transition group cursor-default">
                 <span class="w-[45px] text-xs font-oswald font-bold text-gray-500 uppercase tracking-wider group-hover:text-blue-500 transition">W</span>
                 <div class="flex-grow">
-                    <p class="font-bold text-white uppercase leading-tight">L. Castillo</p>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">SEA</p>
+                    <p class="font-bold text-white uppercase leading-tight">{p.wins.name}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-[1px] tracking-wider">{p.wins.team}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-blue-400 font-oswald font-bold text-lg leading-none">16</p>
+                    <p class="text-blue-400 font-oswald font-bold text-lg leading-none">{p.wins.value}</p>
                 </div>
             </li>
 
