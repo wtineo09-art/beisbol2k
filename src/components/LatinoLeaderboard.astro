@@ -1,6 +1,6 @@
----
 // Widget de "Élite Latina" (Líderes Latinos - Bateo y Pitcheo)
 // Estructura lista para que el editor coloque al líder latino de cada departamento.
+import AdsenseUnit from './AdsenseUnit.astro';
 ---
 
 <div class="flex flex-col gap-6">
@@ -80,11 +80,7 @@
     </div>
 
     <!-- Widget AdSense 300x250 Intercalado -->
-    <div class="bg-gray-200 w-full h-[250px] flex items-center justify-center border-2 border-gray-300 border-dashed shadow-sm">
-        <span class="text-gray-400 font-bold uppercase text-xs tracking-widest text-center px-4">
-            [ ADSENSE - 300x250 ]
-        </span>
-    </div>
+    <AdsenseUnit format="rectangle" className="my-8 flex justify-center w-full" />
 
     <!-- LÍDERES LANZADORES -->
     <div class="bg-gradient-to-br from-gray-900 to-black border-t-4 border-blue-600 shadow-xl overflow-hidden rounded-b-sm">

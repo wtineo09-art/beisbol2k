@@ -283,10 +283,24 @@ const metaDescription = `Sigue la transmisión en vivo del partido de los ${team
 
 <style is:global>
     /* Estilos para forzar que los iframes importados de WP sean responsivos */
+    .content-iframe-wrapper {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
     .content-iframe-wrapper iframe {
         width: 100% !important;
-        height: 100% !important;
+        height: auto !important;
         aspect-ratio: 16 / 9;
         border: none;
+        max-width: 100%;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    /* Estilo para cuando WP envía el iframe envuelto en un párrafo */
+    .content-iframe-wrapper p {
+        width: 100%;
+        margin: 0;
     }
 </style>
