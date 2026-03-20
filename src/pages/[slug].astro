@@ -228,3 +228,17 @@ const pageTitle = type === 'post' ? `${post.title} | Béisbol2K` : type === 'cat
 	</div>
 
 </Layout>
+<style is:global>
+    /* Forzar que las imágenes dentro del contenido de WP sean responsivas */
+    .prose img {
+        max-width: 100% !important;
+        height: auto !important;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* Asegurar que el contenedor no tenga desbordamiento inesperado */
+    article {
+        overflow-x: hidden;
+    }
+</style>
