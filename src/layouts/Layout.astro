@@ -1,9 +1,20 @@
 ---
 interface Props {
 	title: string;
+	description?: string;
+	image?: string;
+	ogType?: string;
 }
 
-const { title } = Astro.props;
+const { 
+	title, 
+	description = "La web #1 de béisbol y MLB. Noticias, resultados en vivo y lo mejor del mundo del diamante.", 
+	image = "https://html.beisbol2k.com/wp-content/uploads/2025/03/200.png",
+	ogType = "website"
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, "https://beisbol2k.com");
+
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import MlbTicker from '../components/MlbTicker.astro';
@@ -14,11 +25,29 @@ import TeamSlider from '../components/TeamSlider.astro';
 <html lang="es">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="La web #1 de béisbol y MLB." />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+		
+		<!-- SEO Primario -->
 		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalURL} />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content={ogType} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={canonicalURL} />
+		<meta property="twitter:title" content={title} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={image} />
+
 		<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
 		<!-- Google AdSense Script -->

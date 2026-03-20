@@ -108,9 +108,10 @@ function getFeaturedImage(post) {
 // Construcción de títulos SEO
 const title = `Ver Juego de ${team.name} en Vivo Hoy - Transmisión MLB - Béisbol2K`;
 const metaDescription = `Sigue la transmisión en vivo del partido de los ${team.name} hoy. Disfruta el mejor béisbol de las Grandes Ligas minuto a minuto.`;
+const seoImage = "https://html.beisbol2k.com/wp-content/uploads/2025/03/200.png"; // Podríamos usar logo del equipo si estuviera en la data
 ---
 
-<Layout title={title}>
+<Layout title={title} description={metaDescription} image={seoImage}>
     <Fragment slot="head">
         <meta name="description" content={metaDescription} />
     </Fragment>

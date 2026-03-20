@@ -100,9 +100,16 @@ function getCategoryName(p) {
 }
 
 const pageTitle = type === 'post' ? `${post.title} | Béisbol2K` : type === 'category' ? `Noticias de ${category.name} | Béisbol2K` : "Error 404 - Béisbol2K";
+const seoDescription = post ? post.excerpt?.replace(/<[^>]*>?/gm, '').substring(0, 160) : undefined;
+const seoImage = post ? getFeaturedImage(post) : undefined;
 ---
 
-<Layout title={pageTitle}>
+<Layout 
+  title={pageTitle} 
+  description={seoDescription} 
+  image={seoImage} 
+  ogType={post ? "article" : "website"}
+>
 
 	<div class="max-w-7xl mx-auto px-4 py-8">
         {!data ? (

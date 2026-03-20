@@ -1,0 +1,122 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "Buscador de Noticias | Béisbol2K";
+---
+
+<Layout title={title}>
+    <div class="bg-blue-900 text-white py-12 border-b-[6px] border-red-600 shadow-inner relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold uppercase font-oswald tracking-tighter leading-tight mb-2">
+                Buscando: <span id="search-term" class="text-red-500">...</span>
+            </h1>
+            <p class="text-lg opacity-80 uppercase tracking-widest font-bold font-oswald">Resultados de nuestra base de datos</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div id="search-status" class="hidden text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600 mb-4"></div>
+            <p class="text-gray-500 font-bold uppercase tracking-widest text-sm">Buscando noticias relacionadas...</p>
+        </div>
+
+        <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Los resultados se inyectarán aquí -->
+        </div>
+
+        <div id="no-results" class="hidden bg-gray-50 border-l-4 border-blue-900 p-12 text-center rounded-r-md shadow-sm">
+            <p class="text-blue-900 font-extrabold text-2xl uppercase font-oswald mb-4">No se encontraron resultados</p>
+            <p class="text-gray-600 mb-8">No hay noticias que coincidan con tu búsqueda. Intenta con otros términos.</p>
+            <a href="/" class="bg-red-600 text-white px-8 py-3 font-bold uppercase tracking-widest hover:bg-black transition-colors inline-block">Volver al Inicio</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://html.beisbol2k.com/graphql';
+
+        async function performSearch() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            
+            if (!query) return;
+
+            document.getElementById('search-term').textContent = query;
+            const statusBox = document.getElementById('search-status');
+            const grid = document.getElementById('results-grid');
+            const noResults = document.getElementById('no-results');
+
+            statusBox.classList.remove('hidden');
+            grid.innerHTML = '';
+            noResults.classList.add('hidden');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: `
+                            query SearchPosts($search: String!) {
+                                posts(first: 21, where: { search: $search }) {
+                                    nodes {
+                                        title
+                                        slug
+                                        excerpt
+                                        featuredImage {
+                                            node {
+                                                sourceUrl
+                                            }
+                                        }
+                                        categories {
+                                            nodes {
+                                                name
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        `,
+                        variables: { search: query }
+                    })
+                });
+
+                const { data } = await response.json();
+                const posts = data?.posts?.nodes || [];
+
+                statusBox.classList.add('hidden');
+
+                if (posts.length === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    posts.forEach(post => {
+                        const img = post.featuredImage?.node?.sourceUrl || 'https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=2070&auto=format&fit=crop';
+                        const cat = post.categories?.nodes[0]?.name || 'MLB';
+                        
+                        const article = `
+                            <article class="bg-white shadow-lg flex flex-col group border-t-2 border-slate-200 hover:border-red-600 transition-colors">
+                                <div class="relative h-48 overflow-hidden">
+                                    <img src="${img}" alt="Thumb" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                    <span class="absolute top-0 right-0 bg-blue-900 text-white px-2 py-1 text-[10px] font-bold uppercase m-3 tracking-widest">${cat}</span>
+                                </div>
+                                <div class="p-6 flex-grow flex flex-col text-center">
+                                    <h3 class="text-xl font-bold uppercase leading-tight mb-3 line-clamp-2 hover:text-red-600 transition-colors font-oswald tracking-wide">
+                                        <a href="/${post.slug}">${post.title}</a>
+                                    </h3>
+                                    <div class="text-gray-600 text-sm line-clamp-3 mb-4 mx-auto font-open leading-relaxed">${post.excerpt}</div>
+                                    <div class="mt-auto">
+                                        <span class="text-xs text-gray-400 font-bold uppercase tracking-widest px-4 border-t border-gray-100 pt-3 block mt-2">Seguir Leyendo &rarr;</span>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                        grid.innerHTML += article;
+                    });
+                }
+            } catch (error) {
+                console.error('Error en búsqueda cliente:', error);
+                statusBox.innerHTML = '<p class="text-red-500 font-bold">Error al conectar con la base de datos.</p>';
+            }
+        }
+
+        performSearch();
+    </script>
+</Layout>

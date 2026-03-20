@@ -22,15 +22,27 @@
         <a href="/partidos-hoy" class="text-gray-300 hover:text-red-500 transition-colors py-3 md:py-4">Partidos</a>
       </nav>
 
-      <!-- Botón JUEGOS DE HOY y Búsqueda (Alineados a la derecha en Desktop) -->
+      <!-- Formulario de Búsqueda y Botón JUEGOS DE HOY -->
       <div class="flex items-center w-full md:w-auto justify-between md:justify-start bg-black/30 md:bg-transparent md:absolute md:right-0 md:h-full">
-        <a href="/partidos-hoy" class="bg-[#ff0000] hover:bg-red-700 text-white font-extrabold uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 px-8 h-full min-h-[48px] md:min-h-full transition-colors w-full md:w-auto">
+        
+        <!-- Buscador -->
+        <form action="/buscar" method="GET" class="hidden lg:flex items-center bg-white/10 rounded-full px-4 py-1 mx-4 border border-white/20 focus-within:border-red-500 transition-colors">
+          <input 
+            type="text" 
+            name="q" 
+            placeholder="Buscar noticias..." 
+            class="bg-transparent border-none text-xs font-bold uppercase tracking-widest text-white placeholder:text-gray-500 focus:outline-none w-32 focus:w-48 transition-all"
+            required
+          />
+          <button type="submit" class="text-gray-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+        </form>
+
+        <a href="/partidos-hoy" class="bg-[#ff0000] hover:bg-red-700 text-white font-extrabold uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 px-8 h-full min-h-[48px] md:min-h-full transition-all hover:shadow-[0_0_20px_rgba(255,0,0,0.4)] w-full md:w-auto">
           <span class="w-[10px] h-[10px] bg-[#ff8888] rounded-full border-2 border-white shadow-[0_0_8px_#fff] animate-pulse"></span>
           JUEGOS DE HOY
         </a>
-        <button class="text-white hover:text-gray-300 px-6 hidden md:block">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        </button>
       </div>
 
     </div>
