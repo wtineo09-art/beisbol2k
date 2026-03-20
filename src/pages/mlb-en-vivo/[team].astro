@@ -12,8 +12,8 @@ export async function getStaticPaths() {
     try {
         const data = await wpquery({
             query: `
-                query GetLivePosts {
-                    posts(first: 100) {
+                query GetLivePages {
+                    pages(first: 100) {
                         nodes {
                             slug
                             title
@@ -24,16 +24,16 @@ export async function getStaticPaths() {
                 }
             `
         });
-        livePosts = data?.posts?.nodes || [];
+        livePosts = data?.pages?.nodes || [];
     } catch (e) {
         console.error("No se pudo obtener transmisiones de WP", e);
     }
 
     // Retornamos SIEMPRE las 30 rutas de los equipos de MLB, pase lo que pase en WP.
     return mlbTeams.map((team) => {
-        // Encontrar el post correspondiente a este equipo. 
-        // El slug del post en WordPress debe ser idéntico al slug del equipo en Astro.
-        const wpData = livePosts.find(post => post.slug === team.slug);
+        // El slug del post en WordPress puede tener sufijos adicionales (ej: bravos-de-atlanta-en-vivo-mlb-2025)
+        // Por tanto, usamos includes para asegurar compatibilidad.
+        const wpData = livePosts.find(post => post.slug.includes(team.slug));
 
         return {
             params: { team: team.slug },

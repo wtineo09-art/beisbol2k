@@ -63,8 +63,14 @@ import TeamSlider from '../components/TeamSlider.astro';
 					<div>
 						<h4 class="text-white text-lg font-bold uppercase font-oswald tracking-widest mb-6 border-b border-gray-800 pb-2">Boletín Béisbol2K</h4>
 						<p class="text-sm font-open mb-4">Recibe las noticias más calientes de la MLB directo en tu bandeja de entrada.</p>
-						<form class="flex flex-col gap-3" onsubmit="event.preventDefault(); alert('Suscripción exitosa a Béisbol2K!');">
-							<input type="email" placeholder="Tu correo electrónico" class="bg-gray-800 text-white px-4 py-3 border border-gray-700 focus:outline-none focus:border-red-500" required />
+						<form action="https://formsubmit.co/wtineo09@gmail.com" method="POST" class="flex flex-col gap-3">
+							<!-- Desactivar captcha temporal de FormSubmit para mejor UX -->
+							<input type="hidden" name="_captcha" value="false">
+							<!-- Redirigir a la misma página (o puedes crear una página /gracias) -->
+							<input type="hidden" name="_next" value="https://beisbol2k.com/">
+							<input type="hidden" name="_subject" value="¡Nueva Suscripción al Boletín Béisbol2K!">
+							
+							<input type="email" name="email" placeholder="Tu correo electrónico" class="bg-gray-800 text-white px-4 py-3 border border-gray-700 focus:outline-none focus:border-red-500" required />
 							<button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-widest py-3 transition-colors shadow-lg">Suscribirme</button>
 						</form>
 					</div>
