@@ -20,6 +20,15 @@ import TeamSlider from '../components/TeamSlider.astro';
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+		<!-- Google AdSense Script -->
+		{import.meta.env.PROD && (
+			<script 
+				async 
+				src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.ADSENSE_CLIENT_ID || "ca-pub-0000000000000000"}`} 
+				crossorigin="anonymous"
+			></script>
+		)}
 	</head>
 	<body class="bg-gray-100 font-sans antialiased text-gray-900 m-0 p-0">
 		

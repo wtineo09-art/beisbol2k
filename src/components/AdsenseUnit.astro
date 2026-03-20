@@ -6,28 +6,30 @@ export interface Props {
     slotId?: string;       // El data-ad-slot que te da Google
     format?: 'auto' | 'fluid' | 'rectangle'; // Formato del bloque
     layoutKey?: string;    // Para in-article ads (-gw-3+c-2z etc)
+    responsive?: boolean;  // data-full-width-responsive
 }
 
 const { 
     className = "my-8 flex justify-center w-full", 
-    slotId = import.meta.env.ADSENSE_DEFAULT_SLOT || "1234567890", 
+    slotId = import.meta.env.ADSENSE_DEFAULT_SLOT || "3602370027", 
     format = 'auto',
-    layoutKey
+    layoutKey,
+    responsive = true
 } = Astro.props;
 
 // Usamos el ID del cliente del .env, o uno de prueba si no existe
 const clientId = import.meta.env.ADSENSE_CLIENT_ID || "ca-pub-0000000000000000";
-const isDev = import.meta.env.DEV;
+const isProd = import.meta.env.PROD;
 ---
 
 <div class={className}>
-    {isDev ? (
+    {!isProd ? (
         <div class="w-full bg-gray-100 py-6 flex flex-col justify-center items-center border border-gray-300 border-dashed min-h-[90px] rounded text-center">
             <span class="text-gray-400 font-bold uppercase text-xs tracking-widest block mb-1">
                 [ ADSENSE PLACEHOLDER ]
             </span>
-            <span class="text-gray-400 text-[10px] font-mono">
-                Slot: {slotId} | Format: {format}
+            <span class="text-gray-400 text-[10px] font-mono whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-2">
+                ID: {clientId} | Slot: {slotId}
             </span>
         </div>
     ) : (
@@ -37,6 +39,7 @@ const isDev = import.meta.env.DEV;
              data-ad-format={format}
              data-ad-client={clientId}
              data-ad-slot={slotId}
+             data-full-width-responsive={responsive.toString()}
              {...(layoutKey && { "data-ad-layout-key": layoutKey })}>
         </ins>
         <script is:inline>
