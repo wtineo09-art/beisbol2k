@@ -146,7 +146,7 @@ const seoImage = "https://html.beisbol2k.com/wp-content/uploads/2025/03/200.png"
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                   <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                                 </span>
-                                Enlace validado para hoy: {new Date(wpData.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}
+                                Enlace validado para hoy: <span id="stream-date-display" class="capitalize-first">Cargando...</span>
                             </p>
                         </div>
                     ) : (
@@ -289,7 +289,21 @@ const seoImage = "https://html.beisbol2k.com/wp-content/uploads/2025/03/200.png"
     </div>
 </Layout>
 
+<script is:inline>
+    // Actualizar fecha dinámica en el stream
+    const streamDateEl = document.getElementById('stream-date-display');
+    if (streamDateEl) {
+        streamDateEl.innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+</script>
+
 <style is:global>
+    .capitalize-first {
+        display: inline-block;
+    }
+    .capitalize-first::first-letter {
+        text-transform: uppercase;
+    }
     /* Estilos para forzar que los iframes importados de WP sean responsivos */
     .content-iframe-wrapper {
         width: 100%;
@@ -312,3 +326,4 @@ const seoImage = "https://html.beisbol2k.com/wp-content/uploads/2025/03/200.png"
         margin: 0;
     }
 </style>
+
