@@ -186,6 +186,13 @@ const seoImage = "https://html.beisbol2k.com/wp-content/uploads/2025/03/200.png"
 
                     <!-- ESPACIO ADSENSE - BELOW PLAYER -->
                     <AdsenseUnit format="auto" className="mt-8 flex justify-center w-full" />
+
+                    <div class="border-t border-gray-200 mt-8 pt-8 flex gap-4 items-center">
+                        <span class="font-bold text-gray-900 uppercase font-oswald text-sm">COMPARTIR JUEGO:</span>
+                        <a href={`https://www.facebook.com/sharer/sharer.php?u=https://beisbol2k.com${Astro.url.pathname}`} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase bg-gray-50 px-3 py-2 rounded-md border border-gray-200 hover:bg-white transition-colors">Facebook</a>
+                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Viendo a los ${team.name} en vivo por Béisbol2K`)}&url=https://beisbol2k.com${Astro.url.pathname}`} target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:text-sky-700 font-bold text-xs uppercase bg-gray-50 px-3 py-2 rounded-md border border-gray-200 hover:bg-white transition-colors">X (Twitter)</a>
+                        <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Viendo a los ${team.name} en vivo por Béisbol2K`)}%20https://beisbol2k.com${Astro.url.pathname}`} target="_blank" rel="noopener noreferrer" class="text-green-600 hover:text-green-800 font-bold text-xs uppercase bg-gray-50 px-3 py-2 rounded-md border border-gray-200 hover:bg-white transition-colors">WhatsApp</a>
+                    </div>
                 </div>
 
                 <!-- Datos Estratégicos del Equipo (Generación SEO Dinámica) -->

@@ -21,7 +21,7 @@ const TEAM_ABBR: Record<number, string> = {
     118: 'KC', 119: 'LAD', 120: 'WSH', 121: 'NYM', 133: 'OAK',
     134: 'PIT', 135: 'SD', 136: 'SEA', 137: 'SF', 138: 'STL',
     139: 'TB', 140: 'TEX', 141: 'TOR', 142: 'MIN', 143: 'PHI',
-    144: 'ATL', 145: 'CWS', 146: 'MIA', 147: 'NYY', 158: 'MIL'
+    144: 'BAL', 145: 'CWS', 146: 'MIA', 147: 'NYY', 158: 'MIL'
 };
 
 const currentYear = new Date().getFullYear().toString();
@@ -51,7 +51,8 @@ async function getLatinoLeader(categories: string, group: string) {
                     LATINO_COUNTRIES.includes(l.person.birthCountry)
                 );
                 if (latino) {
-                    results[cat.leaderCategory] = {
+                    const key = cat.leaderCategory === 'walks' ? 'baseOnBalls' : cat.leaderCategory;
+                    results[key] = {
                         name: latino.person.fullName,
                         team: TEAM_ABBR[latino.team.id] || latino.team.name.substring(0, 3).toUpperCase(),
                         value: latino.value,
